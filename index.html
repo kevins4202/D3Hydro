@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v6.js"></script>
+
+<!-- Create a div where the graph will be -->
+<div id="chart"></div>
+<button id="download">Download Chart</button>
+
+<!-- include index.js -->
+<script src="index.js"></script>
+<!-- <script src="stackedArea.js"></script> -->
+
+<!-- call draw method in D3Draw class -->
+<script>
+    const d3Draw = new D3Draw();
+    d3Draw.draw(
+        [
+            [1, 2, 3, 4, 5, 6, 7, 20,  9],
+            [3, 5, 6, 3, 2, 4, 7, 20, 5]
+        ],
+        {
+            "width": 460,
+            "height": 400,
+            "margins": { top: 10, right: 30, bottom: 30, left: 60 },
+            "type": "scatter",
+            "point-color":"red"
+        }
+    );
+
+    // Add click event listener to the download button
+    document.getElementById('download').addEventListener('click', function () {
+        downloadSVG();
+    });
+    
+    function downloadSVG() {
+        const svg = document.getElementById('chart'); // Replace with the actual SVG element ID
+        const serializer = new XMLSerializer();
+        const svgBlob = new Blob([serializer.serializeToString(svg)], { type: 'image/svg+xml' });
+        const element = document.createElement("a");
+        element.download = "graph.svg";
+        element.href = URL.createObjectURL(svgBlob);
+        element.click();
+        URL.revokeObjectURL(element.href); // Clean up the URL after the download
+    }
+</script>
