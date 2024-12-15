@@ -35,15 +35,9 @@ class D3Draw {
 
             case 'bar':
             case 'scatter':
-                if (labels.length === 2) {
-                    xlabel = labels[0];
-                    ylabel = labels[1];
-                } else if (labels.length === 1) {
-                    ylabel = labels[0];
-                } else {
-                    xlabel = "x";
-                    ylabel = "y";
-                }
+                xlabel = labels[0];
+                ylabel = labels[1];
+
                 if (Array.isArray(data)) {
                     if (Array.isArray(data[0])) {
                         [x, y] = data;
@@ -67,15 +61,9 @@ class D3Draw {
             case 'line':
             case 'area':
             default:
-                if (labels.length === 2) {
-                    xlabel = labels[0];
-                    ylabel = labels[1];
-                } else if (labels.length === 1) {
-                    ylabel = labels[0];
-                } else {
-                    xlabel = "x";
-                    ylabel = "y";
-                }
+                xlabel = labels[0];
+                ylabel = labels[1];
+
                 if (Array.isArray(data)) {
                     if (Array.isArray(data[0])) {
                         [x, y] = data;
@@ -110,8 +98,9 @@ class D3Draw {
         const point_color = config["point-color"] ? config["point-color"] : "steelblue"
         const line_color = config["line-color"] ? config["line-color"] : "steelblue"
         const fill_color = config["fill-color"] ? config["fill-color"] : "steelblue"
+        const grid = config["grid"] ? config["grid"] : false;
 
-        const { x: xx, y: yy } = this.getData(data, xlabel, ylabel, type)
+        const { x: xx, y: yy } = this.getData(data, type, [xlabel, ylabel],)
         // console.log(xx, yy)
 
         const svg = d3.select("#chart")
@@ -120,6 +109,7 @@ class D3Draw {
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
 
         let data_to_plot = [];
 
@@ -248,6 +238,40 @@ class D3Draw {
 
         svg.append("g")
             .call(d3.axisLeft(y));
+
+        if (grid) {
+            svg.append("g")
+                .attr("class", "xAxis")
+                .call(d3.axisBottom(x))
+                .attr("transform", "translate(0," + height + ")");
+
+            //for y axis 
+            svg.append("g")
+                .attr("class", "yAxis")
+                .call(d3.axisLeft(y))
+                .append("text").attr("transform", "rotate(-90)").attr("text-anchor", "end");
+
+            d3.selectAll("g.yAxis g.tick")
+                .append("line")
+                .attr("class", "gridline")
+                .attr("x1", 0)
+                .attr("y1", 0)
+                .attr("x2", width)
+                .attr("y2", 0)
+                .attr("stroke", "#9ca5aecf") // line color
+                .attr("stroke-dasharray", "4") // make it dashed;;
+
+            d3.selectAll("g.xAxis g.tick")
+                .append("line")
+                .attr("class", "gridline")
+                .attr("x1", 0)
+                .attr("y1", -height)
+                .attr("x2", 0)
+                .attr("y2", 0)
+                .attr("stroke", "#9ca5aecf") // line color
+                .attr("stroke-dasharray", "4") // make it dashed;
+        }
+
 
     }
 
