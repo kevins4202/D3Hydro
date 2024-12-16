@@ -6,9 +6,10 @@
 
 <!-- Create a div where the graph will be -->
 <div id="chart"></div>
+<canvas id="canvas"></canvas>
 <button id="download">Download Chart</button>
 
-<!-- include index.js -->
+<script src="download.js"></script>
 <script src="index.js"></script>
 <!-- <script src="stackedArea.js"></script> -->
 
@@ -28,24 +29,8 @@
             "height": 400,
             "margins": { top: 10, right: 30, bottom: 30, left: 60 },
             "type": "scatter",
-            "point-color":"blue",
-            "grid": true,
+            "point-color": "blue",
+
         }
     );
-
-    // Add click event listener to the download button
-    document.getElementById('download').addEventListener('click', function () {
-        downloadSVG();
-    });
-    
-    function downloadSVG() {
-        const svg = document.getElementById('chart'); // Replace with the actual SVG element ID
-        const serializer = new XMLSerializer();
-        const svgBlob = new Blob([serializer.serializeToString(svg)], { type: 'image/svg+xml' });
-        const element = document.createElement("a");
-        element.download = "graph.svg";
-        element.href = URL.createObjectURL(svgBlob);
-        element.click();
-        URL.revokeObjectURL(element.href); // Clean up the URL after the download
-    }
 </script>
