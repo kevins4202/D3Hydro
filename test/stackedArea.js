@@ -21,7 +21,8 @@ class D3Draw {
       // console.log(data)
       // group the data: one array for each value of the X axis.
       const sumstat = d3.group(data, d => d["year"]);
-      console.log(sumstat)
+      console.log("sumstat", sumstat)
+      console.log('data', data)
 
       // Stack the data: each group will be represented on top of each other
       const mygroups = ["Helen", "Amanda", "Ashley"] // list of group names
@@ -47,8 +48,13 @@ class D3Draw {
       const y = d3.scaleLinear()
         .domain([0, d3.max(data, function (d) { return +d.n; }) * 1.2])
         .range([height, 0]);
+      
+      console.log("y", y)
+
       svg.append("g")
         .call(d3.axisLeft(y));
+      
+      console.log("mygroups", mygroups) 
 
       // color palette
       const color = d3.scaleOrdinal()

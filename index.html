@@ -17,20 +17,13 @@
 <script>
     const d3Draw = new D3Draw();
     d3Draw.draw(
-        [
-            { x: 1, y: 2 },
-            { x: 2, y: 4 },
-            { x: 3, y: 6 },
-            { x: 4, y: 8 },
-            { x: 5, y: 10 }
-        ],
+        [12,19,11,13,12,22,13,4,15,16,18,19,20,12,11,9],
         {
-            "width": 460,
-            "height": 400,
+            "width": 600,
+            "height": 600,
             "margins": { top: 10, right: 30, bottom: 30, left: 60 },
-            "type": "scatter",
+            "type": "boxplot",
             "point-color": "blue",
-
         }
     );
 </script>

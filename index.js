@@ -1,5 +1,5 @@
 class D3Draw {
-    getData(data, chartType, labels = []) {
+    getData(data, chartType, labels = [], classes = []) {
         let x, y;
         let xlabel, ylabel;
 
@@ -10,29 +10,43 @@ class D3Draw {
 
         switch (chartType) {
             case 'stackedArea':
-                x = labels;
-                if (typeof data === 'object') {
+                console.log(typeof data);
+                xlabel = labels[0];
+                ylabel = labels[1];
+                if (typeof data === 'object' && !Array.isArray(data)) {
                     const sumstat = d3.group(data, d => d[xlabel]);
-                    const mygroup = range(1, Object.keys(sumstat).length + 1);
+                    const mygroup = classes;
+
+                    console.log(sumstat);
+                    console.log(mygroup);
+
                     y = d3.stack()
                         .keys(mygroup)
-                        .value((d, key) => d[1][key].n)
+                        .value((d, key) => d[1][key][ylabel])
                         (sumstat);
                 } else if (Array.isArray(data)) {
-                    if (data.length !== labels.length) {
-                        throw new Error('labels and data must have the same length');
+                    if (typeof data[0] === 'object' && !Array.isArray(data[0])) {
+                        const sumstat = d3.group(data, d => d[xlabel]);
+
+                        console.log("sumstat", sumstat);
+                        console.log("classes", classes);
+                        console.log("xlabel", xlabel);
+                        console.log("ylabel", ylabel);
+
+                        const mygroup = d3.range(classes.length);
+                        const stackedData = d3.stack()
+                            .keys(mygroup)
+                            .value((d, key) => d[1][key][ylabel])
+                            (sumstat);
+
+                        console.log("stackedData", stackedData);
+
+                        return stackedData;
                     }
-                    y = data.map((d, i) => {
-                        return {
-                            "key": labels[i],
-                            "values": d.map(d => d.n)
-                        }
-                    });
                 } else {
                     throw new Error('data is not an object or array');
                 }
                 break;
-
             case 'bar':
             case 'scatter':
                 xlabel = labels[0];
@@ -99,9 +113,11 @@ class D3Draw {
         const line_color = config["line-color"] ? config["line-color"] : "steelblue"
         const fill_color = config["fill-color"] ? config["fill-color"] : "steelblue"
         const grid = config["grid"] ? config["grid"] : false;
+        const classes = config["classes"] ? config["classes"] : [];
 
-        const { x: xx, y: yy } = this.getData(data, type, [xlabel, ylabel],)
-        // console.log(xx, yy)
+        const data_to_plot = this.getData(data, type, [xlabel, ylabel], classes);
+        console.log("data", data)
+        console.log(data_to_plot);
 
         const svg = d3.select("#chart")
             .append("svg")
@@ -110,19 +126,9 @@ class D3Draw {
             .append("g")
             .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-
-        let data_to_plot = [];
-
-        for (let i = 0; i < xx.length; i++) {
-            data_to_plot.push({
-                x: xx[i],
-                y: yy[i]
-            });
-        }
-
-        console.log(data_to_plot);
-
         let x, y;
+        let xx = data_to_plot[xlabel];
+        let yy = data_to_plot[ylabel];
         //x axis
         switch (type) {
             case "bar":
@@ -159,9 +165,20 @@ class D3Draw {
                     .range([height, 0]);
                 break;
             case "stackedArea":
+                const yearSums = d3.rollup(
+                    data,
+                    group => d3.sum(group, d => +d[ylabel]), // Sum counts for each year group
+                    d => d[xlabel] // Group by year
+                );
+
+                // Get the maximum total sum across all years
+                const maxSum = d3.max(Array.from(yearSums.values()));
+
+                // Create the y-scale
                 y = d3.scaleLinear()
-                    .domain([0, d3.max(data, function (d) { return +d[ylabel]; }) * 1.2])
+                    .domain([0, maxSum * 1.2]) // Add padding by multiplying by 1.5
                     .range([height, 0]);
+                break;
         }
 
         //draw points
@@ -219,12 +236,13 @@ class D3Draw {
                 break
             case "stackedArea":
                 const color = d3.scaleOrdinal()
-                    .domain(xx)
+                    .domain(classes)
                     .range(['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999'])
+
                 svg.selectAll("mylayers")
-                    .data(yy)
+                    .data(data_to_plot)
                     .join("path")
-                    .style("fill", function (d) { name = xx[d.key - 1]; return color(name); })
+                    .style("fill", function (d) { name = classes[d.key - 1]; return color(name); })
                     .attr("d", d3.area()
                         .x(function (d, i) { return x(d.data[0]); })
                         .y0(function (d) { return y(d[0]); })
@@ -232,23 +250,28 @@ class D3Draw {
                     )
         }
 
-        svg.append("g")
-            .attr("transform", `translate(0, ${height})`)
-            .call(d3.axisBottom(x));
+        const xGenerator = d3.axisBottom(x);
+        const yGenerator = d3.axisLeft(y);
+
+        xGenerator.ticks(2);
 
         svg.append("g")
-            .call(d3.axisLeft(y));
+            .attr("transform", `translate(0, ${height})`)
+            .call(xGenerator);
+
+        svg.append("g")
+            .call(yGenerator);
 
         if (grid) {
             svg.append("g")
                 .attr("class", "xAxis")
-                .call(d3.axisBottom(x))
+                .call(xGenerator)
                 .attr("transform", "translate(0," + height + ")");
 
             //for y axis 
             svg.append("g")
                 .attr("class", "yAxis")
-                .call(d3.axisLeft(y))
+                .call(yGenerator)
                 .append("text").attr("transform", "rotate(-90)").attr("text-anchor", "end");
 
             d3.selectAll("g.yAxis g.tick")
