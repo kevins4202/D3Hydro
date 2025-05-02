@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Concentric Circles</title>
+  <style>
+    body {
+      background-color: #fff; /* Set the background color */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .circle-container {
+      position: relative;
+      width: 150px;
+      height: 150px;
+    }
+    .outer-circle {
+      
+      
+      width: 100%;
+      height: 100%;
+    }
+
+    .dark-blue-slice {
+      width: 168px;
+    height: 168px;
+    background: lightblue;
+    clip-path: path('M 84 0 A 84 84 0 0 1 156 126 L 84 84 Z');
+    position: absolute;
+    border-radius: 50%;
+    }
+
+    .light-blue-slice {
+      background-color: #88c1ff;
+      clip-path: polygon(50% 50%, 100% 100%, 0% 100%, 0% 0%, 50% 0%);
+    }
+
+    /* Inner Circle */
+    .inner-circle {
+      position: absolute;
+      border-radius: 50%;
+      background-color: #fff; /* Match the background color */
+      width: 80%;
+      height: 80%;
+      top: 10%;
+      left: 10%;
+    }
+  </style>
+</head>
+<body>
+  <div class="circle-container">
+    <!-- Outer Circle Slices -->
+    <div class="outer-circle dark-blue-slice"></div>
+    <!-- <div class="outer-circle light-blue-slice"></div> -->
+    <!-- Inner Transparent Circle -->
+    <!-- <div class="inner-circle"></div> -->
+  </div>
+</body>
+</html>

@@ -1,29 +1,25 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 
 <!-- Load d3.js -->
 <script src="https://d3js.org/d3.v6.js"></script>
 
 <!-- Create a div where the graph will be -->
 <div id="chart"></div>
-<canvas id="canvas"></canvas>
+<!-- <canvas id="canvas"></canvas> -->
 <button id="download">Download Chart</button>
 
 <script src="download.js"></script>
 <script src="index.js"></script>
-<!-- <script src="stackedArea.js"></script> -->
+<!-- <script src="boxplot.js"></script> -->
 
 <!-- call draw method in D3Draw class -->
 <script>
-    const d3Draw = new D3Draw();
-    d3Draw.draw(
-        [12,19,11,13,12,22,13,4,15,16,18,19,20,12,11,9],
-        {
-            "width": 600,
-            "height": 600,
-            "margins": { top: 10, right: 30, bottom: 30, left: 60 },
-            "type": "boxplot",
-            "point-color": "blue",
-        }
-    );
+  const d3Draw = new D3Draw();
+  d3Draw.draw([4, 5, 8, 14, 20, 25],{
+    "type": "line",
+    "fill-color":"red",
+
+
+  });
 </script>
